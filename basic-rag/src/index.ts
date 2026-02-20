@@ -29,13 +29,13 @@ console.log(`✅ Created ${finalDoc.length} chunks`);
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
   apiKey: process.env.GOOGLE_GEMINI_API_KEY as string,
-  model: "text-embedding-001",
+  model: "text-embedding-004",
 });
 
 const pinecone = new Pinecone();
 const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX_NAME as string);
-const vectorStore = new PineconeStore(embeddings, { pineconeIndex , maxConcurrency: 5});
-// let vectorStore: PineconeStore;
+// const vectorStore = new PineconeStore(embeddings, { pineconeIndex , maxConcurrency: 5});
+let vectorStore: PineconeStore;
 
 console.log("📝 Storing embeddings...");
 
@@ -46,14 +46,14 @@ console.log("📝 Storing embeddings...");
 // console.log("✅ Embeddings stored successfully");
 
 try {
-  //   if (finalDoc.length > 0) {
-  //     // Use addDocuments; if it still errors, the index dimension might be wrong (should be 768)
-  //     vectorStore = await PineconeStore.fromDocuments(finalDoc, embeddings, {
-  //       pineconeIndex,
-  //       maxConcurrency: 5,
-  //     });
-  //     console.log("✅ Embeddings stored");
-  //   }
+    if (finalDoc.length > 0) {
+      // Use addDocuments; if it still errors, the index dimension might be wrong (should be 768)
+      vectorStore = await PineconeStore.fromDocuments(finalDoc, embeddings, {
+        pineconeIndex,
+        maxConcurrency: 5,
+      });
+      console.log("✅ Embeddings stored");
+    }
   // if (finalDoc.length > 0) {
   //     // We use manual batching to avoid the "Must pass at least 1 record" error
   //     // This ensures the SDK always has a valid batch to send
@@ -95,7 +95,7 @@ try {
   //   );
   // }
 
-  await vectorStore.addDocuments(finalDoc);
+  // await vectorStore.addDocuments(finalDoc);
   console.log("🎉 All embeddings stored successfully");
 } catch (error) {
   console.log(
@@ -125,7 +125,7 @@ const retrieve = tool(
 );
 
 const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash", // Recommended stable version
+  model: "gemini-3-flash", // Recommended stable version
   apiKey: process.env.GOOGLE_GEMINI_API_KEY as string,
 });
 
